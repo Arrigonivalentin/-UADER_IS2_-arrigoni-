@@ -31,27 +31,17 @@ def procesar_consulta(context, usertask, userquery):
     """
     Simula una llamada al API de OpenAI y devuelve una respuesta predefinida.
     """
-    # Esta parte simula cómo OpenAI estructura la respuesta
     simulated_response = {
         "choices": [{
             "message": {
-                "content": f"""
-¡Hola! Soy una simulación de ChatGPT 😄
-
-📌 Contexto: {context}
-🎯 Tarea: {usertask}
-❓ Consulta: {userquery}
-
-✅ Respuesta simulada:
-Hola, estoy bien, gracias por preguntar. Soy un asistente conversacional entrenado para ayudarte en tareas de Ingeniería de Sistemas. ¿En qué puedo ayudarte hoy?
-                """.strip()
+                "content": "Hola, estoy bien, gracias por preguntar. Soy un asistente conversacional entrenado para ayudarte en tareas de Ingeniería de Sistemas. ¿En qué puedo ayudarte hoy?"
             }
         }]
     }
     return simulated_response
 
 def main():
-    print("🧪 Simulador de API de ChatGPT (Versión Local - Sin conexión)")
+    print("Simulador de API de ChatGPT (Versión Local - Sin conexión)")
     context = "Actuás como un asistente para estudiantes de Ingeniería de Sistemas."
     usertask = "Ayudás a interpretar el uso del API de OpenAI para consultas técnicas."
 
