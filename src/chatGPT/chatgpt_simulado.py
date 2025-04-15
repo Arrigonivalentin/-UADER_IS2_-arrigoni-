@@ -1,68 +1,55 @@
-"""
-Simulación local del uso del API de OpenAI para trabajo práctico de Ingeniería de Sistemas.
-No requiere conexión a internet ni uso de una API Key.
-"""
+# chatgpt_simulado.py - Simulación de un chat con modelo GPT desde consola
+# Autor: Valentín Arrigoni
+# Descripción: Este script simula un sistema de conversación básico
+# utilizando lógica fija para responder preguntas de usuario.
 
-import json
+def responder(prompt):
+    """
+    Simula una respuesta del modelo ChatGPT a un mensaje dado.
+    Retorna una respuesta predefinida si detecta ciertas palabras clave.
+    """
+    # Normalizamos el prompt a minúsculas
+    prompt = prompt.lower()
 
-# Historial simulado de consultas
-historial = []
-indice_historial = -1
+    # Verifica si el mensaje es un saludo
+    if "hola" in prompt:
+        return "¡Hola! ¿Cómo estás? Soy una IA simulada :)"
 
-def obtener_entrada_usuario():
-    """
-    Obtiene la entrada del usuario con soporte para tecla 'Arriba'.
-    """
-    global indice_historial
-    try:
-        entrada = input(">> ")
-        if entrada == "" and historial:
-            indice_historial = max(0, indice_historial - 1)
-            print(f"(Última consulta): {historial[indice_historial]}")
-            return historial[indice_historial]
-        historial.append(entrada)
-        indice_historial = len(historial)
-        return entrada
-    except KeyboardInterrupt:
-        print("\nSaliendo...")
-        exit()
+    # Verifica si el usuario pregunta por el clima
+    if "clima" in prompt:
+        return "Lo siento, no tengo acceso a datos del clima."
 
-def procesar_consulta(context, usertask, userquery):
-    """
-    Simula una llamada al API de OpenAI y devuelve una respuesta predefinida.
-    """
-    simulated_response = {
-        "choices": [{
-            "message": {
-                "content": "Hola, estoy bien, gracias por preguntar. Soy un asistente conversacional entrenado para ayudarte en tareas de Ingeniería de Sistemas. ¿En qué puedo ayudarte hoy?"
-            }
-        }]
-    }
-    return simulated_response
+    # Respuesta por defecto
+    return "Lo siento, no entendí tu consulta."
 
 def main():
-    print("Simulador de API de ChatGPT (Versión Local - Sin conexión)")
-    context = "Actuás como un asistente para estudiantes de Ingeniería de Sistemas."
-    usertask = "Ayudás a interpretar el uso del API de OpenAI para consultas técnicas."
+    """
+    Función principal para ejecutar el chat simulado por consola.
+    """
+    print("Bienvenido al chat simulado de GPT. Escriba 'salir' para terminar.")
 
     while True:
         try:
-            userquery = obtener_entrada_usuario()
-            if not userquery.strip():
-                print("Por favor, ingresá una consulta válida.")
-                continue
+            # Lee entrada del usuario
+            entrada = input("Usuario: ")
 
-            print(f"You: {userquery}")
+            # Condición para salir
+            if entrada.strip().lower() == "salir":
+                print("¡Hasta luego!")
+                break
 
-            # Simula llamada a API
-            response = procesar_consulta(context, usertask, userquery)
+            # Procesa la respuesta
+            respuesta = responder(entrada)
+            print("IA:", respuesta)
 
-            # Procesar respuesta simulada
-            jsonStr = response["choices"][0]["message"]["content"]
-            print(f"chatGPT: {jsonStr}")
-
+        except KeyboardInterrupt:
+            # Manejo de Ctrl+C
+            print("\nInterrupción manual. Cerrando chat...")
+            break
         except Exception as e:
-            print(f"chatGPT: Ocurrió un error inesperado: {e}")
+            # Captura cualquier otro error inesperado
+            print("Ocurrió un error:", e)
 
+# Punto de entrada del script
 if __name__ == "__main__":
     main()
