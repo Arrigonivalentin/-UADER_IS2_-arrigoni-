@@ -1,55 +1,84 @@
-# chatgpt_simulado.py - Simulación de un chat con modelo GPT desde consola
-# Autor: Valentín Arrigoni
-# Descripción: Este script simula un sistema de conversación básico
-# utilizando lógica fija para responder preguntas de usuario.
+import os
+import sys
 
-def responder(prompt):
+# Intentar importar readline (Linux/macOS) o pyreadline3 (Windows)
+try:
+    import readline  # Para historial de comandos en Linux/macOS
+except ImportError:
+    try:
+        import pyreadline3 as readline  # Para historial de comandos en Windows
+    except ImportError:
+        print("Advertencia: readline no está disponible. Las funciones de historial podrían no funcionar.")
+
+from dotenv import load_dotenv  # Permite cargar variables desde el archivo .env
+from openai import OpenAI  # Cliente oficial de OpenAI
+
+# Cargar variables del archivo .env
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")  # Obtener la clave de API
+
+# Verificación de la API Key
+if not api_key:
+    # Si no se encuentra la API Key, mostrar mensaje y salir
+    print(" error: no se encontró la clave de API.")
+    print(" Asegurate de tener un archivo .env con la variable:")
+    print("OPENAI_API_KEY=tu_clave_aqui")
+    sys.exit(1)
+
+# Crear cliente OpenAI con la API Key cargada
+client = OpenAI(api_key=api_key)
+
+# Función que realiza la consulta al modelo de lenguaje
+def hacer_consulta(userquery):
     """
-    Simula una respuesta del modelo ChatGPT a un mensaje dado.
-    Retorna una respuesta predefinida si detecta ciertas palabras clave.
+    Envía la consulta del usuario al modelo de OpenAI y devuelve la respuesta.
     """
-    # Normalizamos el prompt a minúsculas
-    prompt = prompt.lower()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini-2024-07-18",  # Modelo utilizado
+            messages=[
+                {"role": "system", "content": "Sos un asistente que responde en español."},  # Instrucción inicial
+                {"role": "user", "content": userquery}  # Consulta del usuario
+            ],
+            temperature=1,
+            max_tokens=16384,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
 
-    # Verifica si el mensaje es un saludo
-    if "hola" in prompt:
-        return "¡Hola! ¿Cómo estás? Soy una IA simulada :)"
+        # Extraer y mostrar respuesta del modelo
+        jsonStr = response.choices[0].message.content
+        print(f"\nchatGPT: {jsonStr}\n")
+        return userquery
 
-    # Verifica si el usuario pregunta por el clima
-    if "clima" in prompt:
-        return "Lo siento, no tengo acceso a datos del clima."
+    except Exception as e:
+        # En caso de error, mostrarlo por consola
+        print("\nchatGPT:  Ocurrió un error al invocar la API:")
+        print(e)
+        return None
 
-    # Respuesta por defecto
-    return "Lo siento, no entendí tu consulta."
-
+# Función principal que gestiona el ciclo de preguntas y respuestas
 def main():
     """
-    Función principal para ejecutar el chat simulado por consola.
+    Función principal del programa. Permite al usuario ingresar consultas.
     """
-    print("Bienvenido al chat simulado de GPT. Escriba 'salir' para terminar.")
+    ultima_consulta = ""  # Guarda la última consulta para poder repetirla
 
+    print(" Simulador de ChatGPT. Escribí una consulta o presioná 'Flecha Arriba' para repetir la última.")
     while True:
         try:
-            # Lee entrada del usuario
-            entrada = input("Usuario: ")
-
-            # Condición para salir
-            if entrada.strip().lower() == "salir":
-                print("¡Hasta luego!")
-                break
-
-            # Procesa la respuesta
-            respuesta = responder(entrada)
-            print("IA:", respuesta)
-
+            entrada = input("You: ")  # Solicita entrada al usuario
+            if not entrada.strip():
+                continue
+            if entrada == '\x1b[A' and ultima_consulta:  # Repetir última consulta si se presiona flecha arriba
+                entrada = ultima_consulta
+            ultima_consulta = hacer_consulta(entrada)
         except KeyboardInterrupt:
-            # Manejo de Ctrl+C
-            print("\nInterrupción manual. Cerrando chat...")
-            break
-        except Exception as e:
-            # Captura cualquier otro error inesperado
-            print("Ocurrió un error:", e)
+            # Termina el programa con Ctrl+C
+            print("\n👋 Programa terminado por el usuario.")
+            sys.exit()
 
-# Punto de entrada del script
+# Ejecutar la función principal si el script se corre directamente
 if __name__ == "__main__":
     main()
