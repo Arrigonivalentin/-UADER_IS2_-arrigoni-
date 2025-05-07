@@ -1,0 +1,22 @@
+Escenario: Un editor de texto como Microsoft Word o Google Docs.
+
+-En un documento, podrías tener miles de caracteres.
+
+-Cada carácter tiene atributos como:
+letra ('a', 'b', 'c', etc.)
+
+-fuente (Arial, Times New Roman)
+
+-tamaño
+
+-estilo (negrita, cursiva)
+
+➤ Problema:
+Si se crea una instancia distinta para cada letra, cada una con su propio estilo y fuente, el uso de memoria sería enorme.
+
+➤ Solución con Flyweight:
+-Separar el estado en:
+
+-Estado compartido (intrínseco): fuente, tamaño, estilo. Se reutiliza.
+
+-Estado externo (extrínseco): posición de la letra en el documento, que se pasa al momento de usar el carácter.
